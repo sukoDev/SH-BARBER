@@ -1,0 +1,44 @@
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: sh_barber_frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      - VITE_API_URL=http://localhost:3000
+    depends_on:
+      - backend
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: sh_barber_backend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    env_file:
+      - ./backend/.env
+
+  db:
+    image: postgres:16-alpine
+    container_name: sh_barber_db
+    restart: always
+    environment:
+      POSTGRES_DB: sh_barber_db
+      POSTGRES_USER: sh_barber_user
+      POSTGRES_PASSWORD: sh_barber_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - sh_barber_db_data:/var/lib/postgresql/data
+
+volumes:
+  sh_barber_db_data:
